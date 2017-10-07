@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ChineseIdioms": {
+      "commandName": "Project",
+      "commandLineArgs": "join 风  功"
+    }
+  }
+}
