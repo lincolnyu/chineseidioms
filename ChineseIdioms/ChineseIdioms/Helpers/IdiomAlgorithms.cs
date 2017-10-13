@@ -5,6 +5,24 @@ namespace ChineseIdioms.Linkage
 {
     public static class IdiomAlgorithms
     {
+        public static IReadOnlyCollection<string> IdiomsAsFirstChar(this IdiomsLookup lookup, char firstChar)
+        {
+            if (lookup.FirstCharLookup.TryGetValue(firstChar, out var idioms))
+            {
+                return idioms;
+            }
+            return null;
+        }
+
+        public static IReadOnlyCollection<string> IdiomsAsLastChar(this IdiomsLookup lookup, char firstChar)
+        {
+            if (lookup.LastCharLookup.TryGetValue(firstChar, out var idioms))
+            {
+                return idioms;
+            }
+            return null;
+        }
+
         public static IEnumerable<LinkedList<string>> JoinEnds(this IdiomsLookup lookup, 
             char firstChar, char lastChar, bool trimUsed = true)
         {

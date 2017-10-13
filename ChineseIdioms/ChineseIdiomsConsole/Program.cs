@@ -1,6 +1,7 @@
 ﻿using ChineseIdioms.Io;
 using ChineseIdioms.Linkage;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -16,6 +17,23 @@ namespace ChineseIdiomsConsole
             var idioms = loader.GetAllIdioms();
             _idiomsLookup = new IdiomsLookup();
             _idiomsLookup.Load(idioms);
+        }
+
+        static void NextWithFirst(char first, StreamWriter sw)
+        {
+            var sols = _idiomsLookup.IdiomsAsFirstChar(first);
+            if (sols != null)
+            {
+                var num = 1;
+                foreach (var sol in sols)
+                {
+                    sw.WriteLine($"解{num}: {sol}");
+                }
+            }
+            else
+            {
+                sw.WriteLine($"“{first}”起首无解");
+            }
         }
 
         static void Join(char start, char end, StreamWriter sw)
@@ -41,6 +59,10 @@ namespace ChineseIdiomsConsole
                 sw.WriteLine();
                 num++;
             }
+            if (num == 1)
+            {
+                sw.WriteLine($"连接“{start}”和“{end}”无解");
+            }
         }
 
         static void Main(string[] args)
@@ -55,11 +77,12 @@ namespace ChineseIdiomsConsole
                     {
                         Join(args[2][0], args[3][0], sw);
                     }
-                    else if (action == "next")
+                    else if (action == "first")
                     {
-
+                        NextWithFirst(args[2][0], sw);
                     }
                 }
+                Process.Start(args[0]);
                 // TODO ...
             }
             catch (Exception e)
