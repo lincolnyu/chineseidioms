@@ -3,7 +3,6 @@ using ChineseIdioms.Linkage;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 
 namespace ChineseIdiomsConsole
 {
@@ -28,7 +27,34 @@ namespace ChineseIdiomsConsole
                 foreach (var sol in sols)
                 {
                     sw.WriteLine($"解{num}: {sol}");
+                    num++;
                 }
+            }
+            else
+            {
+                sw.WriteLine($"“{first}”起首无解");
+            }
+        }
+
+        static void FindDeepest(char first, StreamWriter sw)
+        {
+            var sol = _idiomsLookup.GetDeepestAsFirstChar(first);
+            if (sol != null)
+            {
+                var notFirst = false;
+                foreach (var idiom in sol)
+                {
+                    if (notFirst)
+                    {
+                        sw.Write("->");
+                    }
+                    else
+                    {
+                        notFirst = true;
+                    }
+                    sw.Write($"{idiom}");
+                }
+                sw.WriteLine();
             }
             else
             {
@@ -80,6 +106,10 @@ namespace ChineseIdiomsConsole
                     else if (action == "first")
                     {
                         NextWithFirst(args[2][0], sw);
+                    }
+                    else if (action == "deepest")
+                    {
+                        FindDeepest(args[2][0], sw);
                     }
                 }
                 Process.Start(args[0]);

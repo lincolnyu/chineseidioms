@@ -1,10 +1,13 @@
 ﻿using ChineseIdioms.Helpers;
+using System;
 using System.Collections.Generic;
 
 namespace ChineseIdioms.Linkage
 {
     public static class IdiomAlgorithms
     {
+        public delegate bool VisitDelegate(LinkedList<string> chain);
+
         public static IReadOnlyCollection<string> IdiomsAsFirstChar(this IdiomsLookup lookup, char firstChar)
         {
             if (lookup.FirstCharLookup.TryGetValue(firstChar, out var idioms))
@@ -14,13 +17,72 @@ namespace ChineseIdioms.Linkage
             return null;
         }
 
-        public static IReadOnlyCollection<string> IdiomsAsLastChar(this IdiomsLookup lookup, char firstChar)
+        public static IReadOnlyCollection<string> IdiomsAsLastChar(this IdiomsLookup lookup, char lastChar)
         {
-            if (lookup.LastCharLookup.TryGetValue(firstChar, out var idioms))
+            if (lookup.LastCharLookup.TryGetValue(lastChar, out var idioms))
             {
                 return idioms;
             }
             return null;
+        }
+
+        public static string[] GetDeepestAsFirstChar(this IdiomsLookup lookup, char firstChar)
+        {
+            var maxChainLen = 0;
+            string[] maxChain = null;
+            lookup.TraverseDepthFirst(firstChar, chain=>
+            {
+                if (chain.Count > maxChainLen)
+                {
+                    Console.WriteLine($"Got len: {chain.Count}");
+                    maxChainLen = chain.Count;
+                    maxChain = new string[maxChainLen];
+                    chain.CopyTo(maxChain, 0);
+                    if (maxChainLen >= 20)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            });
+            return maxChain;
+        }
+
+        public static bool TraverseDepthFirst(this IdiomsLookup lookup, char firstChar,
+            VisitDelegate visit, LinkedList<string> chain = null, HashSet<string> used = null)
+        {
+            var children = lookup.IdiomsAsFirstChar(firstChar);
+            if (children != null)
+            {
+                if (chain == null)
+                {
+                    chain = new LinkedList<string>();
+                }
+                if (used == null)
+                {
+                    used = new HashSet<string>();
+                }
+                foreach (var child in children)
+                {
+                    if (used.Contains(child))
+                    {
+                        continue;
+                    }
+                    chain.AddLast(child);
+                    used.Add(child);
+                    if (!visit(chain))
+                    {
+                        return false;
+                    }
+                    if (!lookup.TraverseDepthFirst(child[child.Length-1], visit, chain, used))
+                    {
+                        return false;
+                    }
+                    chain.RemoveLast();
+                    used.Remove(child);
+                }
+            }
+            return true;
         }
 
         public static IEnumerable<LinkedList<string>> JoinEnds(this IdiomsLookup lookup, 
