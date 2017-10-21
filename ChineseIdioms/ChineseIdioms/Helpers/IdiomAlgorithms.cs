@@ -1,12 +1,21 @@
 ﻿using ChineseIdioms.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ChineseIdioms.Linkage
 {
     public static class IdiomAlgorithms
     {
-        public delegate bool VisitDelegate(LinkedList<string> chain);
+        public enum VisitResults
+        {
+            Continue,
+            NoDeeper,
+            Quit
+        }
+
+        public delegate VisitResults VisitDelegate(IReadOnlyCollection<string> chain,
+            IReadOnlyCollection<IReadOnlyCollection<string>> children);
 
         public static IReadOnlyCollection<string> IdiomsAsFirstChar(this IdiomsLookup lookup, char firstChar)
         {
@@ -26,30 +35,51 @@ namespace ChineseIdioms.Linkage
             return null;
         }
 
-        public static string[] GetDeepestAsFirstChar(this IdiomsLookup lookup, char firstChar)
+        public static string[] GetDeepestAsFirstChar(this IdiomsLookup lookup, char firstChar,
+            int maxDepth = 30)
         {
             var maxChainLen = 0;
             string[] maxChain = null;
-            lookup.TraverseDepthFirst(firstChar, chain=>
+            lookup.TraverseDepthFirst(firstChar, (chain, childrenChain)=>
             {
-                if (chain.Count > maxChainLen)
+                var chainLen = chain.Count;
+                if (chainLen > maxChainLen)
                 {
-                    Console.WriteLine($"Got len: {chain.Count}");
-                    maxChainLen = chain.Count;
-                    maxChain = new string[maxChainLen];
-                    chain.CopyTo(maxChain, 0);
-                    if (maxChainLen >= 20)
+                    maxChainLen = chainLen;
+                    maxChain = chain.ToArray();
+                }
+                return chainLen >= maxDepth ? VisitResults.Quit : VisitResults.Continue;
+            });
+            return maxChain;
+        }
+
+        public static string[] GetWidestPath(this IdiomsLookup lookup, char firstChar,
+            int maxDepth = 20)
+        {
+            var maxChainLen = 0;
+            var maxAltCount = 0;
+            string[] maxChain = null;
+            lookup.TraverseDepthFirst(firstChar, (chain, childrenChain) =>
+            {
+                var chainLen = chain.Count;
+                if (chainLen > maxChainLen)
+                {
+                    var altCount = childrenChain.Sum(x => x.Count);
+                    if (altCount > maxAltCount)
                     {
-                        return false;
+                        maxAltCount = altCount;
+                        maxChainLen = chain.Count;
+                        maxChain = chain.ToArray();
                     }
                 }
-                return true;
+                return chainLen >= maxDepth ? VisitResults.NoDeeper : VisitResults.Continue;
             });
             return maxChain;
         }
 
         public static bool TraverseDepthFirst(this IdiomsLookup lookup, char firstChar,
-            VisitDelegate visit, LinkedList<string> chain = null, HashSet<string> used = null)
+            VisitDelegate visit, LinkedList<string> chain = null, 
+            HashSet<string> used = null, LinkedList<IReadOnlyCollection<string>> childrenList = null)
         {
             var children = lookup.IdiomsAsFirstChar(firstChar);
             if (children != null)
@@ -62,6 +92,11 @@ namespace ChineseIdioms.Linkage
                 {
                     used = new HashSet<string>();
                 }
+                if (childrenList == null)
+                {
+                    childrenList = new LinkedList<IReadOnlyCollection<string>>();
+                }
+                childrenList.AddLast(children);
                 foreach (var child in children)
                 {
                     if (used.Contains(child))
@@ -70,17 +105,22 @@ namespace ChineseIdioms.Linkage
                     }
                     chain.AddLast(child);
                     used.Add(child);
-                    if (!visit(chain))
+                    var vr = visit(chain, childrenList);
+                    if (vr == VisitResults.Quit)
                     {
                         return false;
                     }
-                    if (!lookup.TraverseDepthFirst(child[child.Length-1], visit, chain, used))
+                    if (vr == VisitResults.Continue)
                     {
-                        return false;
+                        if (!lookup.TraverseDepthFirst(child[child.Length - 1], visit, chain, used, childrenList))
+                        {
+                            return false;
+                        }
                     }
                     chain.RemoveLast();
                     used.Remove(child);
                 }
+                childrenList.RemoveLast();
             }
             return true;
         }

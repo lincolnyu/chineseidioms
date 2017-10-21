@@ -38,7 +38,7 @@ namespace ChineseIdiomsConsole
 
         static void FindDeepest(char first, StreamWriter sw)
         {
-            var sol = _idiomsLookup.GetDeepestAsFirstChar(first);
+            var sol = _idiomsLookup.GetWidestPath(first, 8);
             if (sol != null)
             {
                 var notFirst = false;
