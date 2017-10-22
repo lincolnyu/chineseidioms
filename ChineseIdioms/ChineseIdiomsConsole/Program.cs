@@ -1,8 +1,10 @@
 ﻿using ChineseIdioms.Io;
 using ChineseIdioms.Linkage;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace ChineseIdiomsConsole
 {
@@ -13,7 +15,7 @@ namespace ChineseIdiomsConsole
         static void InitIdiomRepo()
         {
             var loader = new SimpleIdiomsLoader();
-            var idioms = loader.GetAllIdioms();
+            var idioms = loader.GetAllIdioms().Where(x => x.Length == 4);
             _idiomsLookup = new IdiomsLookup();
             _idiomsLookup.Load(idioms);
         }
@@ -36,9 +38,9 @@ namespace ChineseIdiomsConsole
             }
         }
 
-        static void FindDeepest(char first, StreamWriter sw)
+        static void FindDeepest(char first, StreamWriter sw, HashSet<string> excluded = null)
         {
-            var sol = _idiomsLookup.GetWidestPath(first, 8);
+            var sol = _idiomsLookup.GetWidestPath(first, 6, excluded);
             if (sol != null)
             {
                 var notFirst = false;
@@ -109,7 +111,17 @@ namespace ChineseIdiomsConsole
                     }
                     else if (action == "deepest")
                     {
-                        FindDeepest(args[2][0], sw);
+                        HashSet<string> excludeSet = null;
+                        if(args.Length > 3)
+                        {
+                            var excludes = args[3].Split(',');
+                            excludeSet = new HashSet<string>();
+                            foreach (var e in excludes)
+                            {
+                                excludeSet.Add(e);
+                            }
+                        }
+                        FindDeepest(args[2][0], sw, excludeSet);
                     }
                 }
                 Process.Start(args[0]);

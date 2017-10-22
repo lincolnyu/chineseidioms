@@ -54,7 +54,7 @@ namespace ChineseIdioms.Linkage
         }
 
         public static string[] GetWidestPath(this IdiomsLookup lookup, char firstChar,
-            int maxDepth = 20)
+            int maxDepth = 20, HashSet<string> excluded = null)
         {
             var maxChainLen = 0;
             var maxAltCount = 0;
@@ -73,13 +73,13 @@ namespace ChineseIdioms.Linkage
                     }
                 }
                 return chainLen >= maxDepth ? VisitResults.NoDeeper : VisitResults.Continue;
-            });
+            }, null, excluded);
             return maxChain;
         }
 
         public static bool TraverseDepthFirst(this IdiomsLookup lookup, char firstChar,
             VisitDelegate visit, LinkedList<string> chain = null, 
-            HashSet<string> used = null, LinkedList<IReadOnlyCollection<string>> childrenList = null)
+            HashSet<string> excluded = null, LinkedList<IReadOnlyCollection<string>> childrenList = null)
         {
             var children = lookup.IdiomsAsFirstChar(firstChar);
             if (children != null)
@@ -88,9 +88,9 @@ namespace ChineseIdioms.Linkage
                 {
                     chain = new LinkedList<string>();
                 }
-                if (used == null)
+                if (excluded == null)
                 {
-                    used = new HashSet<string>();
+                    excluded = new HashSet<string>();
                 }
                 if (childrenList == null)
                 {
@@ -99,12 +99,12 @@ namespace ChineseIdioms.Linkage
                 childrenList.AddLast(children);
                 foreach (var child in children)
                 {
-                    if (used.Contains(child))
+                    if (excluded.Contains(child))
                     {
                         continue;
                     }
                     chain.AddLast(child);
-                    used.Add(child);
+                    excluded.Add(child);
                     var vr = visit(chain, childrenList);
                     if (vr == VisitResults.Quit)
                     {
@@ -112,13 +112,13 @@ namespace ChineseIdioms.Linkage
                     }
                     if (vr == VisitResults.Continue)
                     {
-                        if (!lookup.TraverseDepthFirst(child[child.Length - 1], visit, chain, used, childrenList))
+                        if (!lookup.TraverseDepthFirst(child[child.Length - 1], visit, chain, excluded, childrenList))
                         {
                             return false;
                         }
                     }
                     chain.RemoveLast();
-                    used.Remove(child);
+                    excluded.Remove(child);
                 }
                 childrenList.RemoveLast();
             }
