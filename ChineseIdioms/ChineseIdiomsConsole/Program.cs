@@ -38,9 +38,9 @@ namespace ChineseIdiomsConsole
             }
         }
 
-        static void FindDeepest(char first, StreamWriter sw, HashSet<string> excluded = null)
+        static void FindWidest(char first, StreamWriter sw, HashSet<string> excluded = null)
         {
-            var sol = _idiomsLookup.GetWidestPath(first, 6, excluded);
+            var sol = _idiomsLookup.GetWidestPath(first, 5, excluded);
             if (sol != null)
             {
                 var notFirst = false;
@@ -109,7 +109,7 @@ namespace ChineseIdiomsConsole
                     {
                         NextWithFirst(args[2][0], sw);
                     }
-                    else if (action == "deepest")
+                    else if (action == "widest")
                     {
                         HashSet<string> excludeSet = null;
                         if(args.Length > 3)
@@ -121,7 +121,7 @@ namespace ChineseIdiomsConsole
                                 excludeSet.Add(e);
                             }
                         }
-                        FindDeepest(args[2][0], sw, excludeSet);
+                        FindWidest(args[2][0], sw, excludeSet);
                     }
                 }
                 Process.Start(args[0]);
