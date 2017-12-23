@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ChineseIdiomsConsoleDNC": {
+      "commandName": "Project",
+      "commandLineArgs": "d:\\temp\\idiomout.txt join 丁 生"
+    }
+  }
+}

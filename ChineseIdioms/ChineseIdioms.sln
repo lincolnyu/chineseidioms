@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChineseIdioms", "ChineseIdioms\ChineseIdioms.csproj", "{7D3FECE8-3252-41EC-8D0E-51E7F3BE968A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChineseIdiomsConsole", "ChineseIdiomsConsole\ChineseIdiomsConsole.csproj", "{DAF79EB0-1D74-420B-A04F-0EF6DFFBD15C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChineseIdiomsConsoleDNC", "ChineseIdiomsConsoleDNC\ChineseIdiomsConsoleDNC.csproj", "{AFB1E906-F2AB-4125-8F96-0C375FFD352C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{DAF79EB0-1D74-420B-A04F-0EF6DFFBD15C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DAF79EB0-1D74-420B-A04F-0EF6DFFBD15C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DAF79EB0-1D74-420B-A04F-0EF6DFFBD15C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFB1E906-F2AB-4125-8F96-0C375FFD352C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFB1E906-F2AB-4125-8F96-0C375FFD352C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFB1E906-F2AB-4125-8F96-0C375FFD352C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFB1E906-F2AB-4125-8F96-0C375FFD352C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
