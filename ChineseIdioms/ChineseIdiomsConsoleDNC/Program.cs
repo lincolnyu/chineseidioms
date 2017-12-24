@@ -165,7 +165,7 @@ namespace ChineseIdiomsConsole
                     var excludeSet = new HashSet<string>();
                     while (true)
                     {
-                        var line = sr.ReadLine().Trim();
+                        var line = sr.ReadLine();
                         if (string.IsNullOrEmpty(line)) break;
                         excludeSet.Add(line.Trim());
                     }
